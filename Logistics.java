@@ -14,52 +14,73 @@ public class Logistics {
 
         // List of the 500 Orders we want to sort
         List<Order> orderlist = new ArrayList<Order>();
+        List<Trolley> trolleys = new ArrayList<Trolley>();
 
         // Test filling for the orders list
         for (int i = 0; i < 500; i++) {
-            orderlist.add(new Order((int) ((Math.random() * 10000) + 1)));
+            orderlist.add(new Order((int) ((Math.random() * 100) + 1)));
             for (int j = 0; j < (int) ((Math.random() * 100) + 1); j++) {
                 orderlist.get(i)
-                    .addArticle(new Article((int) ((Math.random() * 10) + 1)));
+                    .addArticle(new Article((int) ((Math.random() * 1000) + 1)));
             }
         }
 
-        // Get best Order
-        Order rootOrder = getBestOrder(orderlist);
+        while (orderlist.size() > 0) {
+            // Get best Order
+            Order rootOrder = getBestOrder(orderlist);
 
-        // Compute SimIndexes for every order
-        computeSimIndexes(orderlist, rootOrder);
+            // Compute SimIndexes for every order
+            computeSimIndexes(orderlist, rootOrder);
+            
+            // Sort orders for SimIndex
+            Collections.sort(orderlist, new OrderComparator());
 
-        // Sort orders and split them fit onto the trolleys
-        List<Trolley> trolleys = sortAndSplit(orderlist);
-
+            // Sort orders and split them fit onto the trolleys
+            trolleys.add(splitForCartonSize(orderlist));
+        }
+        
         // Test printout
+        print(trolleys);
+    }
+    
+    
+    
+    
+    
+    
+
+    private static void print(List<Trolley> trolleys) {
         for (int i = 0; i < trolleys.size(); i++) {
-            System.out.println(i + ": ");
+            System.out.print(i + ": ");
             for (int j = 0; j < trolleys.get(i).getOrders().size(); j++) {
-                System.out
+                if (j != trolleys.get(i).getOrders().size() - 1) {
+                    System.out
+                        .print(trolleys.get(i).getOrders().get(j).getSimIndex() + ", ");
+                } else {
+                    System.out
                     .println(trolleys.get(i).getOrders().get(j).getSimIndex());
+                }
             }
         }
     }
 
     public static void computeSimIndexes(List<Order> orderlist,
         Order rootOrder) {
-        for (int i = 1; i < orderlist.size(); i++) {
+        for (int i = 0; i < orderlist.size(); i++) {
             orderlist.get(i).setSimIndex(editDistDP(rootOrder.getArticles(),
                 orderlist.get(i).getArticles(), rootOrder.getArticles().size(),
                 orderlist.get(i).getArticles().size()));
         }
-
     }
 
     public static Order getBestOrder(List<Order> orderlist) {
         Order bestOrder = orderlist.get(0);
         for (int i = 1; i < orderlist.size() - 1; i++) {
-            if (orderlist.get(i).getSimIndex() < bestOrder.getSimIndex()) {
+            if (orderlist.get(i).getRouteLength() < bestOrder.getRouteLength()) {
                 bestOrder = orderlist.get(i);
             }
         }
+        bestOrder.setSimIndex(0);
         return bestOrder;
     }
 
@@ -106,23 +127,6 @@ public class Logistics {
         }
 
         return dp[m][n];
-    }
-
-    /**
-     * Sorts a given list of orders and splits them fit onto the trolleys.
-     * 
-     * @param orderlist
-     *            the order list which shall be sorted and splitted.
-     * 
-     * @return a list of trolleys with the splitted orders.
-     */
-    public static List<Trolley> sortAndSplit(List<Order> orderlist) {
-        List<Trolley> trolleys = new ArrayList<Trolley>();
-        for (int i = 0; 0 < orderlist.size(); i++) {
-            Collections.sort(orderlist, new OrderComparator());
-            trolleys.add(i, splitForCartonSize(orderlist));
-        }
-        return trolleys;
     }
 
     /**

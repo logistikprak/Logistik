@@ -5,6 +5,7 @@ public class Order {
     
     //Index, how similar the order is to a previous order, i.e. the root Order
     private Integer simIndex;
+    private int routeLength;
     
     //The carton size of the order
     private int cartonSize;
@@ -21,7 +22,7 @@ public class Order {
     }
 
     public Order(int test) {
-        this.simIndex = test;
+        this.routeLength = test;
     }
 
     public Integer getSimIndex() {
@@ -42,6 +43,14 @@ public class Order {
     
     public void addArticle(Article article) {
         articles.add(article);
+    }
+
+    public int getRouteLength() {
+        return routeLength;
+    }
+
+    public void setRouteLength(int routeLength) {
+        this.routeLength = routeLength;
     }
 }
 
