@@ -75,11 +75,14 @@ public class Logistics {
 
     public static Order getBestOrder(List<Order> orderlist) {
         Order bestOrder = orderlist.get(0);
-        for (int i = 1; i < orderlist.size() - 1; i++) {
+        int index = 0;
+        for (int i = 0; i < orderlist.size(); i++) {
             if (orderlist.get(i).getRouteLength() < bestOrder.getRouteLength()) {
                 bestOrder = orderlist.get(i);
+                index = i;
             }
         }
+        orderlist.remove(index);
         bestOrder.setSimIndex(0);
         return bestOrder;
     }
